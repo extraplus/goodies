@@ -65,6 +65,7 @@ class AutoJavascriptHelper extends AppHelper {
 			$this->request->controller . '.js',
 			$this->request->controller . DS . $this->request->action . '.js');
 
+		if(!defined('VIEWS')) define('VIEWS', APP . 'View' . DS);
 		foreach ($files as $file) {
 			$file = $path . $file;
 			if ($theme && !empty($this->theme)) {
