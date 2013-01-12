@@ -7,11 +7,14 @@ App::uses('HtmlHelper', 'View/Helper');
  * Automatic JavaScript Helper
  *
  * Facilitates JavaScript Automatic loading and inclusion for page specific JS
+ * and CSS
  *
  * @copyright   Copyright 2009-2011, Graham Weldon (http://grahamweldon.com)
+ * @copyright   parts Copyright 2013, Andreas Pizsa (http://twitter.com/AndreasPizsa)
  * @package     goodies
  * @subpackage  goodies.View.Helper
  * @author      Graham Weldon (http://grahamweldon.com)
+ * @author      Andreas Pizsa (http://twitter.com/AndreasPizsa) (CSS)
  * @license     http://www.opensource.org/licenses/mit-license.php The MIT License
  */
 class AutoJavascriptHelper extends AppHelper {
@@ -55,27 +58,48 @@ class AutoJavascriptHelper extends AppHelper {
  *
  * @return void
  */
-	public function beforeRender() {
+	public function beforeRender($viewFile) {
 		extract($this->__options);
 		if (!empty($path)) {
 			$path .= DS;
 		}
 
-		$files = array(
-			$this->request->controller . '.js',
-			$this->request->controller . DS . $this->request->action . '.js');
+		$fileTypes = array(
+			'js' => array(
+				$this->request->controller . '.js',
+				$this->request->controller . DS . $this->request->action . '.js'
+			),
+			'css' => array(
+				$this->request->controller . '.css',
+				$this->request->controller . DS . $this->request->action . '.css'
+			)
+		);
 
 		if(!defined('VIEWS')) define('VIEWS', APP . 'View' . DS);
-		foreach ($files as $file) {
-			$file = $path . $file;
-			if ($theme && !empty($this->theme)) {
-				$includeFile = VIEWS . 'themed' . DS . $this->theme . DS . 'webroot' . DS . 'js' . DS . $file;
-			} else {
-				$includeFile = JS . $file;
-			}
-			if (file_exists($includeFile)) {
-				$file = str_replace('\\', '/', $file);
-				$this->Html->script($file, array('inline' => false));
+		foreach ($fileTypes as $fileType=>$files) {
+			foreach ($files as $file) {
+				$file = $path . $file;
+				$includeFile = ( $fileType=='js' ? JS : CSS ) . $file;
+				
+				// theme file overrides non-theme file if it exists
+				if ($theme && !empty($this->theme)) {
+					$theThemedFile = VIEWS . 'themed' . DS . $this->theme . DS . 'webroot' . DS . $fileType . DS . $file;
+					if(file_exists($theThemedFile)) $includeFile = $theThemedFile;
+				}
+
+				if (file_exists($includeFile)) {
+					$file = str_replace('\\', '/', $file);
+					switch($fileType) {
+						case 'js' :
+							$this->Html->script($file, array('inline' => false));
+							break;
+						case 'css':
+							$this->Html->css($file, null, array('inline' => false));
+							break;
+						default:
+							// just ignore anything else
+					}
+				}
 			}
 		}
 	}
