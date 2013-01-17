@@ -91,7 +91,7 @@ class AutoJavascriptHelper extends AppHelper {
 					$file = str_replace('\\', '/', $file);
 					switch($fileType) {
 						case 'js' :
-							$this->Html->script($file, array('inline' => false));
+							$this->Html->script($file, isset($block) ? compact('block') : array('inline' => false));
 							break;
 						case 'css':
 							$this->Html->css($file, null, array('inline' => false));
