@@ -83,7 +83,8 @@ class AutoJavascriptHelper extends AppHelper {
 				
 				// theme file overrides non-theme file if it exists
 				if ($theme && !empty($this->theme)) {
-					$theThemedFile = VIEWS . 'Themed' . DS . ucfirst($this->theme) . DS . 'webroot' . DS . $fileType . DS . $file;	// Uppercase 'Themed' is important
+					$theThemedFile = App::themePath($this->theme). DS . 'webroot' . DS . $fileType . DS . $file;	// Uppercase 'Themed' is important
+//					$theThemedFile = VIEWS . 'Themed' . DS . ucfirst($this->theme) . DS . 'webroot' . DS . $fileType . DS . $file;	// Uppercase 'Themed' is important
 					if(file_exists($theThemedFile)) $includeFile = $theThemedFile;
 				}
 
